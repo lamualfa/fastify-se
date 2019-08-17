@@ -5,10 +5,10 @@ const fastify_plugin = require("fastify-plugin");
 class SE {
   constructor(opts = {}) {
     const defaultSeidGenerator = (req, rep, callback) => {
-      if (this._lastId) {
-        callback(this._lastId++);
+      if (this.lastIndexSeid) {
+        callback(this.lastIndexSeid++);
       } else {
-        this["_lastId"] = 0;
+        this["lastIndexSeid"] = 0;
 
         callback(0);
       }
@@ -18,7 +18,8 @@ class SE {
 
     this["seidGenerator"] = opts.seidGenerator || defaultSeidGenerator;
     this["stream"] = opts.stream || stream.PassThrough;
-    this["streamOptions"] = opts.streamOptions || {};
+    this["streamOptions"] = opts.streamOptions || { allowHalfOpen: false };
+    this["autoGenerateId"] = opts.autoGenerateId || true;
     this["clients"] = {};
 
     this["plugin"] = fastify_plugin((instance, opts, done) => {
@@ -31,16 +32,21 @@ class SE {
           rep["eventStream"] = new self.stream(self.streamOptions);
           rep["headersSent"] = false;
 
+          if (self.autoGenerateId) {
+            rep["lastId"] = 0;
+          }
+
           self.clients[seid] = rep;
 
           next();
         });
       });
 
-      function sendEvent(rep, data, event, id) {
+      function sendEvent(rep, data, event, id, retry) {
         if (!rep.headersSent) {
           rep.type("text/event-stream");
           rep.header("Connection", "keep-alive");
+          rep.header("Cache-Control", "no-cache");
 
           rep.send(rep.eventStream);
 
@@ -50,6 +56,11 @@ class SE {
         let parseId = "";
         let parseData = "";
         let parseEvent = "";
+        let parseRetry = "";
+
+        if (self.autoGenerateId) {
+          parseId = rep.lastId++;
+        }
 
         if (typeof data === "object") {
           if (data.id) {
@@ -67,6 +78,10 @@ class SE {
           if (data.event) {
             parseEvent = data.event;
           }
+
+          if (data.retry) {
+            parseRetry = data.retry;
+          }
         } else {
           if (data) {
             parseData = data;
@@ -79,40 +94,55 @@ class SE {
           if (id) {
             parseId = id;
           }
+
+          if (retry) {
+            parseRetry = retry;
+          }
         }
 
         let responseString = "";
 
-        if (parseId) {
-          responseString += `id: ${parseId}\n`;
+        if (parseId || parseId === 0) {
+          responseString += `id:${parseId}\n`;
         }
 
         if (parseEvent) {
-          responseString += `event: ${parseEvent}\n`;
+          responseString += `event:${parseEvent}\n`;
+        }
+
+        if (parseRetry) {
+          responseString += `retry:${parseRetry}\n`;
         }
 
         if (parseData) {
-          responseString += `data: ${parseData}\n\n`;
+          responseString += `data:${parseData}\n\n`;
         }
 
         rep.eventStream.write(responseString);
       }
 
-      instance.decorateReply("sendEvent", function(data, event, id) {
-        sendEvent(this, data, event, id);
+      instance.decorateReply("sendEvent", function(data, event, id, retry) {
+        sendEvent(this, data, event, id, retry);
       });
 
-      instance.decorateReply("sendEventById", function(seid, data, event, id) {
+      instance.decorateReply("sendEventBySeid", function(
+        seid,
+        data,
+        event,
+        id,
+        retry
+      ) {
         const rep = self.clients[seid];
 
         if (rep) {
-          sendEvent(rep, data, event, id);
+          sendEvent(rep, data, event, id, retry);
         } else {
           return false;
         }
       });
 
       instance.decorateReply("endEvent", function() {
+        this.eventStream.ended = true;
         this.eventStream.end();
 
         delete self.clients[this.request.seid];

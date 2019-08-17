@@ -1,14 +1,29 @@
 {
   "name": "fastify-se",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.2",
+  "description": "Fastify plugin for handle Server-sent Events. https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "laodemalfatih",
+  "license": "MIT",
   "dependencies": {
     "fastify-plugin": "^1.6.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laodemalfatih/fastify-se.git"
+  },
+  "bugs": {
+    "url": "https://github.com/laodemalfatih/fastify-se/issues"
+  },
+  "homepage": "https://github.com/laodemalfatih/fastify-se#readme",
+  "keywords": [
+    "fastify",
+    "sse",
+    "event",
+    "fastify-plugin"
+  ]
 }
