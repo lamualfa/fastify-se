@@ -55,31 +55,30 @@ fastify.get("/events", function(request, reply) {
 
   // OR data with type object
 
-  reply.sendEvent(
-    {
+  reply.sendEvent({
+    data: {
       from: "@other_people",
       message: "hey guy",
       date: "x-x-x-x"
     },
-    "new_private_message"
-  );
+    event: "new_private_message"
+  });
 
   // If you want to trigger event for other client
 
-  reply.sendEventBySeid(
-    "@my_friend", // Your custom seid
-    {
+  reply.sendEventBySeid({
+    seid: "@my_friend", // Your custom seid
+    data: {
       from: "@my_friend",
       message: "my name is x"
     },
-    "send_new_message"
-  );
+    event: "send_new_message"
+  });
 
   // Important
   reply.endEvent();
 
   // reply.sendEvent will throw error if you call it in here
   reply.sendEvent("hello world", "greeting");
-
 });
 ```

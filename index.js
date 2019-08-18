@@ -68,7 +68,7 @@ class SE {
           }
 
           if (data.data) {
-            if (typeof data.data) {
+            if (typeof data.data === "object") {
               parseData = JSON.stringify(data.data);
             } else {
               parseData = data.data;
