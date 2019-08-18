@@ -66,14 +66,16 @@ fastify.get("/events", function(request, reply) {
 
   // If you want to trigger event for other client
 
-  reply.sendEventBySeid({
-    seid: "@my_friend", // Your custom seid
-    data: {
-      from: "@my_friend",
-      message: "my name is x"
-    },
-    event: "send_new_message"
-  });
+  reply.sendEventBySeid(
+    "@my_friend", // Your custom seid
+    {
+      data: {
+        from: "@my_friend",
+        message: "my name is x"
+      },
+      event: "send_new_message"
+    }
+  );
 
   // Important
   reply.endEvent();

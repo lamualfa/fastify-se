@@ -1,6 +1,6 @@
 {
   "name": "fastify-se",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Fastify plugin for handle Server-sent Events. https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events",
   "main": "index.js",
   "scripts": {
