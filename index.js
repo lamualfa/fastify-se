@@ -20,10 +20,15 @@ class SE {
     this["stream"] = opts.stream || stream.PassThrough;
     this["streamOptions"] = opts.streamOptions || { allowHalfOpen: false };
     this["autoGenerateId"] = opts.autoGenerateId || true;
+    this["serverTimeout"] = opts.serverTimeout;
     this["clients"] = {};
 
     this["plugin"] = fastify_plugin((instance, opts, done) => {
       const self = this;
+
+      if (self.serverTimeout) {
+        instance.server.setTimeout(self.serverTimeout);
+      }
 
       instance.addHook("preHandler", function(req, rep, next) {
         self.seidGenerator(req, rep, function(seid) {

@@ -23,6 +23,7 @@ this["seidGenerator"] = opts.seidGenerator || defaultSeidGenerator;
 this["stream"] = opts.stream || stream.PassThrough;
 this["streamOptions"] = opts.streamOptions || { allowHalfOpen: false };
 this["autoGenerateId"] = opts.autoGenerateId || true;
+this["serverTimeout"] = opts.serverTimeout || 120000;
 this["clients"] = {};
 ```
 
@@ -30,6 +31,7 @@ this["clients"] = {};
 - `stream` : Stream class will be passing to `reply.send(stream)`.
 - `streamOptions` : Options for create new stream, `new stream(streamOptions)`.
 - `autoGenerateId` : If `true`. The library will automatically create `id` in every `sendEvent`.
+- `serverTimeout` : Set timeout for incoming messages, default `120000ms` or equal to `2s`, in `ms`.
 - `clients` : All active `reply` will be store in this object with `seid` as a key. The `reply` will deleted after connection closed.
 
 ### METHODS
