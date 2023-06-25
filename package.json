@@ -9,7 +9,7 @@
   "author": "laodemalfatih",
   "license": "MIT",
   "dependencies": {
-    "fastify-plugin": "^1.6.0"
+    "fastify-plugin": "^4.5.0"
   },
   "devDependencies": {},
   "repository": {
